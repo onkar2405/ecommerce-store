@@ -1,3 +1,4 @@
+const { NTH_ORDER_DISCOUNT } = require("../constansts");
 const cartService = require("../services/cartService");
 
 /**
@@ -7,20 +8,6 @@ const cartService = require("../services/cartService");
  */
 exports.addItemsToCart = (req, res) => {
   try {
-    const allowedFields = ["productId", "name", "price", "quantity"];
-    const receivedFields = Object.keys(req.body);
-
-    // Validate request body
-    const isValidOperation = receivedFields.every((field) =>
-      allowedFields.includes(field)
-    );
-
-    if (!isValidOperation) {
-      return res
-        .status(400)
-        .json({ message: "Invalid fields in request body", allowedFields });
-    }
-
     const item = req.body;
     cartService.addItem(item);
     const updatedCart = cartService.getCart();

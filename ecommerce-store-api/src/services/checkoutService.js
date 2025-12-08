@@ -1,7 +1,9 @@
 const store = require("../data/store");
 
-exports.checkoutItems = () => {
+exports.checkoutItems = (req) => {
   const items = store.cart;
+  let discountAmount = 0;
+  const couponCode = req?.body?.couponCode;
 
   if (items.length === 0) {
     throw new Error("Cart is empty");
@@ -9,11 +11,28 @@ exports.checkoutItems = () => {
 
   const total = calculateTotal(items);
   const itemDetails = getItemDetails(items);
+  const validCoupon = store.discounts?.find(
+    (discount) => discount.code === couponCode
+  );
 
+  if (!validCoupon) {
+    throw new Error("Invalid coupon code");
+  }
+
+  if (validCoupon.used) {
+    throw new Error("Coupon code has already been used");
+  }
+
+  if (validCoupon) {
+    validCoupon.used = true;
+    discountAmount = total * 0.1; // 10% discount
+  }
   const order = {
     id: new Date().getTime().toString() + 1,
     items: itemDetails,
-    total: total,
+    total: total - discountAmount,
+    subTotal: total,
+    discount: discountAmount,
     date: new Date(),
     user: "Guest",
     paymentMerthod: items.paymentMerthod || "Cash on Delivery",
@@ -26,22 +45,14 @@ exports.checkoutItems = () => {
 };
 
 /**
- * Method to calculate the total price of items with possible discounts
+ * Method to calculate the total price of items.
  * @param {*} items items to calculate the total for
  * @returns {Number} The total price of the items
  */
 function calculateTotal(items) {
-  let total = 0;
-  items.forEach((element) => {
-    total += element.price;
-  });
-
-  // Apply a 10% discount for every Nth order
-  if (store.orders.length % store.N === 4) {
-    total = total * 0.9; // Apply 10% discount
-  }
-
-  return total;
+  return items.reduce((sum, item) => {
+    return sum + item.price * item.quantity;
+  }, 0);
 }
 
 /**

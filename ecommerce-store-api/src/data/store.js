@@ -7,5 +7,4 @@ module.exports = {
   orders: [],
   coupons: [],
   orderCount: 0,
-  N: 5, // every 5th order triggers coupon
 };

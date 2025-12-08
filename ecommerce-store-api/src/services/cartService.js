@@ -1,3 +1,4 @@
+const { NTH_ORDER_DISCOUNT } = require("../constansts");
 const store = require("../data/store");
 
 /**
@@ -28,4 +29,18 @@ exports.addItem = (item) => {
  */
 exports.getCart = () => {
   return store.cart;
+};
+
+/**
+ * Method to remove the first 5 orders from the cart
+ */
+exports.clearNOrders = () => {
+  try {
+    const cart = store.cart;
+    // Remove the first 5 items from the cart (or all if less than 5)
+    const itemsToRemove = Math.min(NTH_ORDER_DISCOUNT, cart.length);
+    cart.splice(0, itemsToRemove);
+  } catch (error) {
+    console.error("Error clearing orders from cart:", error);
+  }
 };

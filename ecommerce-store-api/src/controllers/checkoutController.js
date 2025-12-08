@@ -7,7 +7,7 @@ const checkoutService = require("../services/checkoutService");
  */
 exports.checkoutItems = (req, res) => {
   try {
-    checkoutService.checkoutItems();
+    checkoutService.checkoutItems(req);
     res.status(200).json({ message: "Checkout successful" });
   } catch (error) {
     res
