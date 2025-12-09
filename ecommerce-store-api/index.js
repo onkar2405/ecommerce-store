@@ -1,11 +1,16 @@
 const express = require("express");
 const cors = require("cors");
 
+// Import routes
+const cartRoutes = require("./src/routes/cartRoutes");
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = 4000;
+app.use("/cart", cartRoutes);
+
+const PORT = 3000;
 
 app.listen(PORT, () => {
   console.log(`API server running on port ${PORT}`);
