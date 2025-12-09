@@ -15,12 +15,14 @@ exports.checkoutItems = (req) => {
     (discount) => discount.code === couponCode
   );
 
-  if (!validCoupon) {
-    throw new Error("Invalid coupon code");
-  }
+  if (couponCode && !validCoupon) {
+    if (!validCoupon) {
+      throw new Error("Invalid coupon code");
+    }
 
-  if (validCoupon.used) {
-    throw new Error("Coupon code has already been used");
+    if (validCoupon.used) {
+      throw new Error("Coupon code has already been used");
+    }
   }
 
   if (validCoupon) {
