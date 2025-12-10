@@ -9,7 +9,6 @@ exports.addItem = (item) => {
   for (let cartItem of store.cart) {
     if (cartItem.productId === item.productId) {
       cartItem.quantity += Number(item.quantity);
-      cartItem.price += Number(item.price) * Number(item.quantity);
       return store.cart;
     }
   }

@@ -3,12 +3,14 @@ const cors = require("cors");
 
 // Import routes
 const cartRoutes = require("./src/routes/cartRoutes");
+const checkoutRoutes = require("./src/routes/checkoutRoutes");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.use("/cart", cartRoutes);
+app.use("/checkout", checkoutRoutes);
 
 const PORT = 3000;
 
