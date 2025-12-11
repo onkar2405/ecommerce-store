@@ -1,9 +1,20 @@
+import { BrowserRouter, Link, Route, Router, Routes } from "react-router-dom";
 import "./App.css";
+import { MainPage } from "./components/MainPage";
+import Header from "./components/Header";
+import { CartPage } from "./components/CartPage";
 
 function App() {
   return (
     <>
-      <h1>E-commerce Store</h1>
+      <BrowserRouter>
+        <Header />
+
+        <Routes>
+          <Route path="/" element={<MainPage />} />
+          <Route path="/cart" element={<CartPage />} />
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }

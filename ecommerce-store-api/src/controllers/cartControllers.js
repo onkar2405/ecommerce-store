@@ -28,7 +28,7 @@ exports.addItemsToCart = (req, res) => {
 exports.getCartItems = (req, res) => {
   try {
     const cartItems = cartService.getCart();
-    res.status(200).json({ cart: cartItems });
+    res.status(200).json(cartItems);
   } catch (error) {
     res
       .status(500)
