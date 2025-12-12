@@ -1,9 +1,26 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
 import { checkout } from "../api/storeApi";
 
 const TotalSummary = ({ subTotal, discount }) => {
+  const navigate = useNavigate();
+
   const onCheckout = async () => {
-    await checkout();
+    try {
+      await checkout();
+      toast.success("Order placed successfully!");
+      // small delay so toast is visible
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (e) {
+      toast.error("Failed to place the order!!", e.message);
+      // small delay so toast is visible
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    }
   };
 
   return (

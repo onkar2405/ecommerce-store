@@ -1,4 +1,6 @@
 import { BrowserRouter, Link, Route, Router, Routes } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
+
 import "./App.css";
 import { MainPage } from "./components/MainPage";
 import Header from "./components/Header";
@@ -8,6 +10,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
+        <Toaster position="top-center" />
         <Header />
 
         <Routes>
