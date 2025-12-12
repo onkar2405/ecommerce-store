@@ -6,6 +6,7 @@ import TotalSummary from "./TotalSummary";
 
 export const CartPage = () => {
   const [cartItems, setCartItems] = useState([]);
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
 
   useEffect(() => {
     getCartItems().then((res) => setCartItems(res.data));
@@ -18,6 +19,22 @@ export const CartPage = () => {
       subTotal += item.price * item.quantity;
     });
     return subTotal;
+  };
+
+  const calculateDiscount = () => {
+    // 10% discount if coupon is applied, otherwise 0
+    if (appliedCoupon) {
+      return Math.round(subTotal() * 0.1);
+    }
+    return 0;
+  };
+
+  const handleApplyCoupon = (couponCode) => {
+    setAppliedCoupon(couponCode);
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
   };
 
   return (
@@ -38,10 +55,18 @@ export const CartPage = () => {
         )}
       </div>
       <div>
-        <CouponCode />
+        <CouponCode
+          appliedCoupon={appliedCoupon}
+          onApplyCoupon={handleApplyCoupon}
+        />
 
         {cartItems.length != 0 && (
-          <TotalSummary subTotal={subTotal()} discount={20} />
+          <TotalSummary
+            subTotal={subTotal()}
+            discount={calculateDiscount()}
+            appliedCoupon={appliedCoupon}
+            onRemoveCoupon={handleRemoveCoupon}
+          />
         )}
       </div>
     </div>

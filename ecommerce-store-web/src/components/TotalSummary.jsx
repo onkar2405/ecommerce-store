@@ -3,7 +3,12 @@ import toast from "react-hot-toast";
 
 import { checkout } from "../api/storeApi";
 
-const TotalSummary = ({ subTotal, discount }) => {
+const TotalSummary = ({
+  subTotal,
+  discount,
+  appliedCoupon,
+  onRemoveCoupon,
+}) => {
   const navigate = useNavigate();
 
   const onCheckout = async () => {
@@ -35,9 +40,35 @@ const TotalSummary = ({ subTotal, discount }) => {
       <div className="summary-row">
         <span>Discount</span>
         <span className={discount > 0 ? "discount-green" : ""}>
-          - ₹{discount}
+          {discount > 0 ? `- ₹${discount}` : "₹0"}
+          {appliedCoupon && <span> (10% off)</span>}
         </span>
       </div>
+
+      {appliedCoupon && (
+        <div
+          className="summary-row"
+          style={{ fontSize: "12px", color: "#666" }}
+        >
+          <span>
+            Applied Coupon: <strong>{appliedCoupon}</strong>
+          </span>
+          <button
+            onClick={onRemoveCoupon}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#dc3545",
+              cursor: "pointer",
+              textDecoration: "underline",
+              padding: 0,
+              fontSize: "12px",
+            }}
+          >
+            Remove
+          </button>
+        </div>
+      )}
 
       <hr className="summary-divider" />
 
