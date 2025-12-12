@@ -47,6 +47,19 @@ exports.checkoutItems = (req) => {
 };
 
 /**
+ * Method to get order history
+ * @returns {Array} The list of past orders
+ */
+exports.getOrderHistory = () => {
+  try {
+    return store.orders;
+  } catch (error) {
+    console.error("Error retrieving order history:", error);
+    throw new Error("Could not retrieve order history");
+  }
+};
+
+/**
  * Method to calculate the total price of items.
  * @param {*} items items to calculate the total for
  * @returns {Number} The total price of the items

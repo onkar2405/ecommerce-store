@@ -37,7 +37,7 @@ exports.generateDiscount = (req, res) => {
 exports.getCouponCodes = (req, res) => {
   try {
     const coupons = getCouponCodes();
-    res.status(200).json({ coupons });
+    res.status(200).json(coupons);
   } catch (error) {
     res.status(500).json({
       success: false,

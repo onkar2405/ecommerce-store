@@ -9,7 +9,7 @@ const store = require("../data/store");
 exports.addItem = (item) => {
   for (let cartItem of store.cart) {
     if (cartItem.productId === item.productId) {
-      cartItem.quantity += Number(item.quantity);
+      cartItem.quantity = Number(item.quantity);
       return store.cart;
     }
   }

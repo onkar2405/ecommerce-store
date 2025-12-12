@@ -1,12 +1,21 @@
-export const CartItem = ({ price, quantity, name, image }) => {
+export const CartItem = ({ price, quantity, name, imageUrl }) => {
   return (
     <div className="cart-item">
-      <img src="../../Laptop.jpg" alt={name} />
+      <img src={imageUrl} alt={name} />
 
       <div className="cart-item-details">
-        <p>Name: {name}</p>
-        <p>Quantity: {quantity}</p>
-        <p>Price: {price * quantity}</p>
+        <p className="cart-info">
+          <span>Name </span>
+          <span className="cart-item-value">{name}</span>
+        </p>
+        <p className="cart-info">
+          <span>Quantity</span>
+          <span className="cart-item-value">{quantity}</span>
+        </p>
+        <p className="cart-info">
+          <span>Price</span>
+          <span className="cart-item-value">{price * quantity}</span>
+        </p>
       </div>
     </div>
   );

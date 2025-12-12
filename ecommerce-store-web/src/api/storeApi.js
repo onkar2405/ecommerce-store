@@ -34,7 +34,7 @@ export const getCartItems = () => {
  * @returns Promise resolving to the checkout result
  */
 export const checkout = () => {
-  return apiClient.post("/cart/checkout");
+  return apiClient.post("/checkout");
 };
 
 /**
@@ -43,4 +43,20 @@ export const checkout = () => {
  */
 export const generateDiscountCode = () => {
   return apiClient.post("/admin/discount/generate");
+};
+
+/**
+ * Method to get available coupons
+ * @returns Promise resolving to the available coupons
+ */
+export const getAvailableCoupons = () => {
+  return apiClient.get("/admin/coupons");
+};
+
+/**
+ * Method to get order history
+ * @returns Promise resolving to the order history
+ */
+export const getOrderHistory = () => {
+  return apiClient.get("/checkout/orders");
 };

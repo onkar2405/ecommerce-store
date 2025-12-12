@@ -15,3 +15,18 @@ exports.checkoutItems = (req, res) => {
       .json({ message: "Error during checkout", error: error.message });
   }
 };
+
+/**
+ * Method to get order history
+ */
+exports.getOrderHistory = (req, res) => {
+  try {
+    const orders = checkoutService.getOrderHistory();
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({
+      message: "Error retrieving order history",
+      error: error.message,
+    });
+  }
+};
