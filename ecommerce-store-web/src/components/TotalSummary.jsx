@@ -3,6 +3,29 @@ import toast from "react-hot-toast";
 
 import { checkout } from "../api/storeApi";
 
+/**
+ * TotalSummary Component - Displays order summary and checkout button.
+ *
+ * Shows the order summary including subtotal, discount amount, applied coupon info,
+ * and final total. Includes the checkout button to process the order. The discount
+ * is displayed as 10% off when a coupon is applied and can be removed by the user.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {number} props.subTotal - Total price before discounts
+ * @param {number} props.discount - Discount amount in rupees
+ * @param {string} [props.appliedCoupon] - Currently applied coupon code (null if none)
+ * @param {Function} [props.onRemoveCoupon] - Callback when removing a coupon
+ * @returns {React.ReactElement} Order summary section with checkout button
+ *
+ * @example
+ * <TotalSummary
+ *   subTotal={10000}
+ *   discount={1000}
+ *   appliedCoupon="SAVE10"
+ *   onRemoveCoupon={() => removeCoupon()}
+ * />
+ */
 const TotalSummary = ({
   subTotal,
   discount,
@@ -11,6 +34,15 @@ const TotalSummary = ({
 }) => {
   const navigate = useNavigate();
 
+  /**
+   * Processes checkout and navigates to homepage after order placement.
+   * Shows success/error toast messages and adds a 1-second delay before navigation
+   * to allow toast visibility.
+   *
+   * @async
+   * @function
+   * @returns {Promise<void>}
+   */
   const onCheckout = async () => {
     try {
       await checkout();

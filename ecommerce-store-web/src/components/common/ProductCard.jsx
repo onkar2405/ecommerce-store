@@ -1,7 +1,18 @@
 import { useState } from "react";
 import { addItemToCart } from "../../api/storeApi";
 
-// Debounce utility
+/**
+ * Debounce utility function to delay and prevent rapid successive function calls.
+ * Useful for reducing API calls when user rapidly clicks add/subtract buttons.
+ *
+ * @param {Function} fn - The function to debounce
+ * @param {number} [delay=300] - Delay in milliseconds before executing the function
+ * @returns {Function} A debounced version of the input function
+ *
+ * @example
+ * const debouncedFn = debounce(() => addToCart(), 300);
+ * debouncedFn(); // Executes after 300ms of inactivity
+ */
 const debounce = (fn, delay = 300) => {
   let timer;
   return (...args) => {
@@ -10,6 +21,29 @@ const debounce = (fn, delay = 300) => {
   };
 };
 
+/**
+ * ProductCard Component - Displays a single product with add to cart functionality.
+ *
+ * This component renders a product card with image, name, price, and quantity controls.
+ * Users can add the product to cart and adjust quantity (1-9 items max). The component
+ * uses debouncing to prevent excessive API calls when rapidly updating quantities.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} props.productId - Unique identifier for the product
+ * @param {string} props.productName - Display name of the product
+ * @param {number} props.price - Price of the product in rupees
+ * @param {string} props.imageUrl - URL to the product image
+ * @returns {React.ReactElement} A product card with controls for adding to cart
+ *
+ * @example
+ * <ProductCard
+ *   productId="p1"
+ *   productName="Laptop"
+ *   price={50000}
+ *   imageUrl="/laptop.jpg"
+ * />
+ */
 const ProductCard = ({ productId, productName, price, imageUrl }) => {
   const [qty, setQty] = useState(0); // 0 means "Add to Cart" is visible
 
@@ -18,6 +52,13 @@ const ProductCard = ({ productId, productName, price, imageUrl }) => {
     await addItemToCart(productDetails);
   }, 300);
 
+  /**
+   * Increments product quantity (max 9) and updates cart via API.
+   * Uses debounced API call to avoid excessive server requests.
+   *
+   * @function
+   * @returns {void}
+   */
   const handleAdd = () => {
     const newQty = Math.min(qty + 1, 9);
     setQty(newQty);
@@ -30,6 +71,13 @@ const ProductCard = ({ productId, productName, price, imageUrl }) => {
     });
   };
 
+  /**
+   * Decrements product quantity (min 1) and updates cart via API.
+   * Uses debounced API call to avoid excessive server requests.
+   *
+   * @function
+   * @returns {void}
+   */
   const handleSubtract = () => {
     const newQty = Math.max(qty - 1, 1);
     setQty(newQty);
@@ -42,6 +90,14 @@ const ProductCard = ({ productId, productName, price, imageUrl }) => {
     });
   };
 
+  /**
+   * Initial add to cart action - sets quantity to 1 and calls API.
+   * This function is triggered when user clicks the initial "Add to Cart" button
+   * (when quantity is 0).
+   *
+   * @function
+   * @returns {void}
+   */
   const handleAddToCartInitial = () => {
     setQty(1);
 

@@ -8,6 +8,35 @@ import {
   getOrderHistory,
 } from "../api/storeApi";
 
+/**
+ * CouponCode Component - Manages coupon code display and application.
+ *
+ * This component displays available coupon codes fetched from the API and allows users
+ * to apply one coupon at a time. Only one coupon can be active simultaneously. Features
+ * include:
+ * - Copy coupon codes to clipboard
+ * - Apply/validate coupon codes
+ * - Display coupon application status
+ * - Generate new coupons
+ * - Show remaining orders needed for new coupons
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {string} props.appliedCoupon - Currently applied coupon code (null if none)
+ * @param {Function} props.onApplyCoupon - Callback function when coupon is applied
+ * @returns {React.ReactElement} Coupon code management interface
+ *
+ * @example
+ * <CouponCode
+ *   appliedCoupon="SAVE10"
+ *   onApplyCoupon={(code) => console.log(code)}
+ * />
+ *
+ * State:
+ * - availableCoupons: Array of available coupon objects {code, used}
+ * - orders: Array of user's past orders
+ * - copiedCode: Currently copied coupon code (for UI feedback)
+ */
 export function CouponCode({ appliedCoupon, onApplyCoupon }) {
   const [availableCoupons, setAvailableCoupons] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -15,10 +44,26 @@ export function CouponCode({ appliedCoupon, onApplyCoupon }) {
 
   const couponCodeRef = useRef("");
 
+  /**
+   * Updates the coupon code input field value.
+   *
+   * @function
+   * @param {React.ChangeEvent} e - Input change event
+   * @returns {void}
+   */
   const addCouponCode = (e) => {
     couponCodeRef.current.value = e.target.value;
   };
 
+  /**
+   * Copies coupon code text to clipboard and shows brief visual feedback.
+   * Displays a check icon for 1.5 seconds after successful copy.
+   *
+   * @async
+   * @function
+   * @param {string} coupon - Coupon code to copy
+   * @returns {Promise<void>}
+   */
   const copyToClipboard = async (coupon) => {
     try {
       await navigator.clipboard.writeText(coupon);
@@ -29,6 +74,14 @@ export function CouponCode({ appliedCoupon, onApplyCoupon }) {
     }
   };
 
+  /**
+   * Validates and applies a coupon code to the cart.
+   * Checks if entered code exists in available coupons list and applies discount.
+   * Shows success/error toast messages and clears input on success.
+   *
+   * @function
+   * @returns {void}
+   */
   const handleApplyCode = () => {
     const enteredCode = couponCodeRef.current.value.trim();
 
@@ -50,6 +103,14 @@ export function CouponCode({ appliedCoupon, onApplyCoupon }) {
     }
   };
 
+  /**
+   * Generates a new discount code and refreshes available coupons list.
+   * Fetches newly generated coupons from the API and updates component state.
+   *
+   * @async
+   * @function
+   * @returns {Promise<void>}
+   */
   const generateCouponCodes = async () => {
     try {
       await generateDiscountCode();
