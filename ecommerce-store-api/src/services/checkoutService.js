@@ -1,8 +1,12 @@
 const store = require("../data/store");
+const { NTH_ORDER_DISCOUNT } = require("../constansts");
+const { generateCode } = require("../utils/codeGenerator");
+const { clearNOrders } = require("./cartService");
 
 exports.checkoutItems = (req) => {
   const items = store.cart;
   let discountAmount = 0;
+  let discountPercentage = 0;
   const couponCode = req?.body?.couponCode;
 
   if (items.length === 0) {
@@ -11,23 +15,30 @@ exports.checkoutItems = (req) => {
 
   const total = calculateTotal(items);
   const itemDetails = getItemDetails(items);
-  const validCoupon = store.discounts?.find(
-    (discount) => discount.code === couponCode
+  const validCoupon = store.coupons?.find(
+    (coupon) => coupon.code === couponCode
   );
 
   if (couponCode && !validCoupon) {
-    if (!validCoupon) {
-      throw new Error("Invalid coupon code");
-    }
+    throw new Error("Invalid coupon code");
+  }
 
-    if (validCoupon.used) {
-      throw new Error("Coupon code has already been used");
-    }
+  if (validCoupon && validCoupon.used) {
+    throw new Error("Coupon code has already been used");
   }
 
   if (validCoupon) {
     validCoupon.used = true;
-    discountAmount = total * 0.1; // 10% discount
+    discountPercentage = validCoupon.discountPercentage || 10;
+    discountAmount = total * (discountPercentage / 100);
+
+    // Remove the used coupon from store by finding it by code
+    const couponIndex = store.coupons.findIndex(
+      (coupon) => coupon.code === validCoupon.code
+    );
+    if (couponIndex > -1) {
+      store.coupons.splice(couponIndex, 1);
+    }
   }
   const order = {
     id: new Date().getTime().toString() + 1,
@@ -44,6 +55,9 @@ exports.checkoutItems = (req) => {
 
   // Clear the cart after checkout
   store.cart = [];
+
+  // Generate coupon code if every Nth order is reached
+  generateCouponAfterCheckout();
 };
 
 /**
@@ -86,4 +100,32 @@ function getItemDetails(items) {
   });
 
   return names;
+}
+
+/**
+ * Method to generate a coupon code after every Nth order
+ * Called automatically after checkout
+ * @returns {void}
+ */
+function generateCouponAfterCheckout() {
+  const { orders } = store;
+
+  // Calculate how many coupons should have been generated based on orders
+  const expectedCoupons = Math.floor(orders.length / NTH_ORDER_DISCOUNT);
+  const generatedCoupons = store.totalCouponsGenerated;
+
+  // Generate a new coupon if we've reached a new milestone
+  if (generatedCoupons < expectedCoupons) {
+    const code = generateCode();
+    const discountPercentage = 10; // Default 10% discount
+    store?.coupons.push({
+      code,
+      discountPercentage,
+      used: false,
+    });
+    store.totalCouponsGenerated++;
+
+    // Clear the first N orders from the cart after generating a discount code
+    clearNOrders();
+  }
 }

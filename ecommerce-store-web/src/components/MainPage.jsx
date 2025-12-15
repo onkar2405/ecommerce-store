@@ -9,15 +9,17 @@ import { Products } from "./Products";
  * include banners, featured sections, etc.
  *
  * @component
+ * @param {Object} props - Component props
+ * @param {Function} [props.onAddToCart] - Callback function when items are added to cart
  * @returns {React.ReactElement} Main page layout containing the products grid
  *
  * @example
- * <MainPage />
+ * <MainPage onAddToCart={() => updateCart()} />
  */
-export const MainPage = () => {
+export const MainPage = ({ onAddToCart }) => {
   return (
     <div>
-      <Products />
+      <Products onAddToCart={onAddToCart} />
     </div>
   );
 };

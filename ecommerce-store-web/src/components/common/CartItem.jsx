@@ -24,7 +24,9 @@
 export const CartItem = ({ price, quantity, name, imageUrl }) => {
   return (
     <div className="cart-item">
-      <img src={imageUrl} alt={name} />
+      <div className="cart-img-wrapper">
+        <img src={imageUrl} alt={name} className="cart-img" />
+      </div>
 
       <div className="cart-item-details">
         <p className="cart-info">

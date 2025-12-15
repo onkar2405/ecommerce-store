@@ -45,6 +45,7 @@
   height: 40px;
   background-color: rgb(146, 146, 79);
   padding: 12px;
+  border-radius: 8px;
 }
 
 .header-item {
@@ -52,6 +53,46 @@
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.cart-link {
+  position: relative;
+}
+
+.cart-icon-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-icon {
+  font-size: 32px;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+
+.cart-icon:hover {
+  transform: scale(1.1);
+}
+
+.cart-badge {
+  position: absolute;
+  top: 0px;
+  right: -6px;
+  background-color: #ff4444;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .product-card {
@@ -155,7 +196,7 @@
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.07);
   color: black;
   padding: 16px;
-  gap: 24px;
+  gap: 16px;
   display: flex;
   justify-content: space-evenly;
 }
@@ -182,11 +223,28 @@
   margin-bottom: 8px;
 }
 
+.cart-img-wrapper {
+  width: 100%;
+  height: 160px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 6px;
+  background-color: #f6f6f6;
+}
+
+.cart-img {
+  object-fit: contain;
+  max-width: 100%;
+  max-height: 100%;
+}
+
 .cart-info {
   display: flex;
   justify-content: space-between;
   gap: 32px;
-  margin: 8px;
+  margin: 2px;
   font-size: 16px;
   padding-right: 24px;
 }
@@ -203,7 +261,7 @@
   text-align: left;
   display: flex;
   flex-direction: column;
-  row-gap: 12px;
+  row-gap: 4px;
 }
 
 .coupon-codes {
@@ -256,11 +314,13 @@
   border-radius: 6px;
   width: fit-content;
   margin-bottom: 8px;
+  width: 230px;
 }
 
 .coupon-text {
   font-size: 15px;
   font-weight: 600;
+  width: 80%;
 }
 
 .copy-btn {
@@ -285,6 +345,7 @@
 
 .code-container {
   height: 100px;
+  margin-top: 8px;
   overflow: auto;
   scrollbar-width: none;
 }

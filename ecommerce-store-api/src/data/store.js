@@ -7,4 +7,5 @@ module.exports = {
   orders: [],
   coupons: [],
   orderCount: 0,
+  totalCouponsGenerated: 0,
 };

@@ -10,15 +10,17 @@ import ProductCard from "./common/ProductCard";
  * and add-to-cart functionality.
  *
  * @component
+ * @param {Object} props - Component props
+ * @param {Function} [props.onAddToCart] - Callback function when items are added to cart
  * @returns {React.ReactElement} Grid of product cards
  *
  * @example
- * <Products />
+ * <Products onAddToCart={() => updateCart()} />
  *
  * @note Product data is imported from productData.js. To add/modify products,
  *       update the products array in src/api/productData.js
  */
-export const Products = () => {
+export const Products = ({ onAddToCart }) => {
   return (
     <div className="products">
       {products.map((product) => (
@@ -28,6 +30,7 @@ export const Products = () => {
           productName={product.name}
           price={product.price}
           imageUrl={product.imageUrl}
+          onAddToCart={onAddToCart}
         />
       ))}
     </div>

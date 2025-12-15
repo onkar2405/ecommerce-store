@@ -18,7 +18,7 @@ import { CiShoppingCart } from "react-icons/ci";
  * @note This component uses React Router for navigation and should be placed within
  *       a BrowserRouter context (typically in the main App component).
  */
-export default function Header() {
+export default function Header({ cartCount = 0, onCartUpdate }) {
   return (
     <>
       <nav>
@@ -26,8 +26,13 @@ export default function Header() {
           <Link className="header-item" to="/">
             Store
           </Link>
-          <Link className="header-item" to="/cart">
-            <CiShoppingCart />
+          <Link className="header-item cart-link" to="/cart">
+            <div className="cart-icon-container">
+              <CiShoppingCart className="cart-icon" />
+              {cartCount > 0 && (
+                <span className="cart-badge">{cartCount}</span>
+              )}
+            </div>
           </Link>
         </div>
       </nav>

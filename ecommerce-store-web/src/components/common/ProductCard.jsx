@@ -44,12 +44,16 @@ const debounce = (fn, delay = 300) => {
  *   imageUrl="/laptop.jpg"
  * />
  */
-const ProductCard = ({ productId, productName, price, imageUrl }) => {
+const ProductCard = ({ productId, productName, price, imageUrl, onAddToCart }) => {
   const [qty, setQty] = useState(0); // 0 means "Add to Cart" is visible
 
   // Debounced API caller
   const debouncedAddToCart = debounce(async (productDetails) => {
     await addItemToCart(productDetails);
+    // Call the callback to update cart count
+    if (onAddToCart) {
+      onAddToCart();
+    }
   }, 300);
 
   /**
@@ -67,6 +71,7 @@ const ProductCard = ({ productId, productName, price, imageUrl }) => {
       productId,
       name: productName,
       price,
+      imageUrl,
       quantity: newQty,
     });
   };
@@ -86,6 +91,7 @@ const ProductCard = ({ productId, productName, price, imageUrl }) => {
       productId,
       name: productName,
       price,
+      imageUrl,
       quantity: newQty,
     });
   };
@@ -105,6 +111,7 @@ const ProductCard = ({ productId, productName, price, imageUrl }) => {
       productId,
       name: productName,
       price,
+      imageUrl,
       quantity: 1,
     });
   };

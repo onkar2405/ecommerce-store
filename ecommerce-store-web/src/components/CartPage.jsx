@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getCartItems } from "../api/storeApi";
+import { getAvailableCoupons, getCartItems } from "../api/storeApi";
 import { CartItem } from "./common/CartItem";
 import { CouponCode } from "./CouponCode";
 import TotalSummary from "./TotalSummary";
@@ -10,14 +10,15 @@ import TotalSummary from "./TotalSummary";
  * This component manages the shopping cart state including items, applied coupons,
  * and discount calculations. It fetches cart items from the API on mount and handles
  * coupon application/removal. The page displays a list of cart items, coupon code
- * management, and the order summary with total price calculation including 10% discount
- * when a coupon is applied.
+ * management, and the order summary with total price calculation with dynamic discount.
  *
  * @component
+ * @param {Object} props - Component props
+ * @param {Function} [props.onCartUpdate] - Callback function when cart is updated
  * @returns {React.ReactElement} Shopping cart page with items, coupons, and summary
  *
  * @example
- * <CartPage />
+ * <CartPage onCartUpdate={() => updateCartCount()} />
  *
  * State:
  * - cartItems: Array of items in the cart
@@ -25,14 +26,28 @@ import TotalSummary from "./TotalSummary";
  *
  * Calculated Values:
  * - subTotal: Sum of all (price × quantity) for cart items
- * - discount: 10% of subtotal if coupon applied, 0 otherwise
+ * - discount: dynamic discount based on coupon percentage
  */
-export const CartPage = () => {
+export const CartPage = ({ onCartUpdate }) => {
   const [cartItems, setCartItems] = useState([]);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [availableCoupons, setAvailableCoupons] = useState([]);
 
   useEffect(() => {
     getCartItems().then((res) => setCartItems(res.data));
+  }, []);
+
+  useEffect(() => {
+    // Fetch available coupons to get discount percentages
+    getAvailableCoupons()
+      .then((res) => {
+        const coupons = Array.isArray(res.data) ? res.data : [];
+        setAvailableCoupons(coupons);
+      })
+      .catch((error) => {
+        console.error("Error fetching coupons:", error);
+        setAvailableCoupons([]);
+      });
   }, []);
 
   /**
@@ -53,15 +68,30 @@ export const CartPage = () => {
 
   /**
    * Calculates the discount amount based on applied coupon.
-   * Returns 10% of subtotal if a coupon is applied, otherwise 0.
+   * Returns the discount percentage of subtotal if a coupon is applied, otherwise 0.
    *
    * @function
    * @returns {number} Discount amount in rupees
    */
   const calculateDiscount = () => {
-    // 10% discount if coupon is applied, otherwise 0
     if (appliedCoupon) {
-      return Math.round(subTotal() * 0.1);
+      const couponObj = availableCoupons.find((c) => c.code === appliedCoupon);
+      const discountPercentage = couponObj?.discountPercentage || 10;
+      return Math.round(subTotal() * (discountPercentage / 100));
+    }
+    return 0;
+  };
+
+  /**
+   * Gets the discount percentage of the applied coupon.
+   *
+   * @function
+   * @returns {number} Discount percentage (e.g., 10 for 10%)
+   */
+  const getAppliedCouponDiscount = () => {
+    if (appliedCoupon) {
+      const couponObj = availableCoupons.find((c) => c.code === appliedCoupon);
+      return couponObj?.discountPercentage || 10;
     }
     return 0;
   };
@@ -114,8 +144,10 @@ export const CartPage = () => {
           <TotalSummary
             subTotal={subTotal()}
             discount={calculateDiscount()}
+            discountPercentage={getAppliedCouponDiscount()}
             appliedCoupon={appliedCoupon}
             onRemoveCoupon={handleRemoveCoupon}
+            onCartUpdate={onCartUpdate}
           />
         )}
       </div>

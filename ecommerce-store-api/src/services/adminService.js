@@ -12,32 +12,28 @@ exports.getCouponCodes = () => {
 };
 
 /**
- * Method to generate a coupon code for every Nth order
- * @returns {String} Generated coupon code
+ * Method to get coupon generation status and remaining orders needed
+ * @returns {Object} Object with generation status information
  */
 exports.generateCouponCode = () => {
   const { orders } = store;
 
   if (orders.length === 0) {
-    throw new Error("No previous orders found to generate discount code");
+    throw new Error("No previous orders found");
   }
 
-  if (orders.length % NTH_ORDER_DISCOUNT != 0) {
-    throw new Error(
-      `No discount code generated. Place ${
-        NTH_ORDER_DISCOUNT - (orders.length % NTH_ORDER_DISCOUNT)
-      } more orders to receive a discount code.`
-    );
-  }
+  // Calculate how many coupons should have been generated based on orders
+  const expectedCoupons = Math.floor(orders.length / NTH_ORDER_DISCOUNT);
+  const generatedCoupons = store.totalCouponsGenerated;
+  const ordersNeeded =
+    NTH_ORDER_DISCOUNT - (orders.length % NTH_ORDER_DISCOUNT);
 
-  const code = generateCode();
-  store?.coupons.push({
-    code,
-    used: false,
-  });
-
-  // Clear the first N orders from the cart after generating a discount code
-  clearNOrders();
-
-  return code;
+  // Return information about coupon generation status
+  return {
+    totalOrders: orders.length,
+    generatedCoupons: generatedCoupons,
+    expectedCoupons: expectedCoupons,
+    ordersNeeded: ordersNeeded,
+    nextCouponAt: (generatedCoupons + 1) * NTH_ORDER_DISCOUNT,
+  };
 };

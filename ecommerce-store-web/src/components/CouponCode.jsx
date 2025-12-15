@@ -2,11 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { FiCopy, FiCheck } from "react-icons/fi";
 import toast from "react-hot-toast";
 
-import {
-  generateDiscountCode,
-  getAvailableCoupons,
-  getOrderHistory,
-} from "../api/storeApi";
+import { getAvailableCoupons } from "../api/storeApi";
 
 /**
  * CouponCode Component - Manages coupon code display and application.
@@ -39,7 +35,6 @@ import {
  */
 export function CouponCode({ appliedCoupon, onApplyCoupon }) {
   const [availableCoupons, setAvailableCoupons] = useState([]);
-  const [orders, setOrders] = useState([]);
   const [copiedCode, setCopiedCode] = useState(null);
 
   const couponCodeRef = useRef("");
@@ -90,65 +85,51 @@ export function CouponCode({ appliedCoupon, onApplyCoupon }) {
       return;
     }
 
-    const isValidCoupon = availableCoupons.some(
+    const validCoupon = availableCoupons.find(
       (coupon) => coupon.code === enteredCode
     );
 
-    if (isValidCoupon) {
+    if (validCoupon) {
       onApplyCoupon(enteredCode);
       couponCodeRef.current.value = "";
-      toast.success(`Coupon ${enteredCode} applied! 10% discount activated.`);
+      toast.success(
+        `Coupon ${enteredCode} applied! ${validCoupon.discountPercentage}% discount activated.`
+      );
     } else {
       toast.error("Invalid coupon code");
     }
   };
 
   /**
-   * Generates a new discount code and refreshes available coupons list.
-   * Fetches newly generated coupons from the API and updates component state.
+   * Fetches available coupons and coupon status information.
+   * Does not generate new coupons - only fetches existing ones.
+   * Coupons are generated automatically after checkout.
    *
    * @async
    * @function
    * @returns {Promise<void>}
    */
-  const generateCouponCodes = async () => {
+  const checkAvailableCodes = async () => {
     try {
-      await generateDiscountCode();
       const response = await getAvailableCoupons();
       const coupons = Array.isArray(response.data) ? response.data : [];
       setAvailableCoupons(coupons);
-      toast.success("Coupon code generated!");
+
+      if (coupons.length === 0) {
+        setAvailableCoupons([]);
+        toast.info(
+          "No coupon codes available yet. Complete more orders to earn coupons!"
+        );
+      }
     } catch (e) {
-      console.error("Error generating coupon:", e);
-      toast.error("Failed to generate coupon code.");
+      setAvailableCoupons([]);
+      console.error("Error fetching coupons:", e);
+      toast.error("Failed to fetch coupon codes.");
     }
   };
 
   useEffect(() => {
-    const fetchCoupons = async () => {
-      try {
-        const response = await getAvailableCoupons();
-        const coupons = Array.isArray(response.data) ? response.data : [];
-        setAvailableCoupons(coupons);
-      } catch (error) {
-        console.error("Error fetching coupons:", error);
-        setAvailableCoupons([]);
-      }
-    };
-
-    const fetchOrders = async () => {
-      try {
-        const response = await getOrderHistory();
-        const orderList = Array.isArray(response.data) ? response.data : [];
-        setOrders(orderList);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
-        setOrders([]);
-      }
-    };
-
-    fetchCoupons();
-    fetchOrders();
+    checkAvailableCodes();
   }, []);
 
   return (
@@ -166,7 +147,17 @@ export function CouponCode({ appliedCoupon, onApplyCoupon }) {
             marginBottom: "10px",
           }}
         >
-          <span>✓ Coupon {appliedCoupon} applied - 10% OFF</span>
+          {(() => {
+            const appliedCouponObj = availableCoupons.find(
+              (c) => c.code === appliedCoupon
+            );
+            const discountPct = appliedCouponObj?.discountPercentage || 0;
+            return (
+              <span>
+                ✓ Coupon {appliedCoupon} applied - {discountPct}% OFF
+              </span>
+            );
+          })()}
         </div>
       )}
 
@@ -191,21 +182,11 @@ export function CouponCode({ appliedCoupon, onApplyCoupon }) {
         >
           Apply code
         </button>
-
-        <button
-          className="coupon-code-button"
-          onClick={() => generateCouponCodes()}
-        >
-          Check available codes
-        </button>
       </div>
 
       <div className="code-container">
         {availableCoupons.length === 0 ? (
-          <p className="no-coupons-text">
-            No coupon codes available. Place more {5 - orders.length} orders to
-            get a coupon code.
-          </p>
+          <p className="no-coupons-text">No coupon codes available.</p>
         ) : (
           availableCoupons.map((coupon) => {
             const isApplied = appliedCoupon === coupon.code;
@@ -223,7 +204,7 @@ export function CouponCode({ appliedCoupon, onApplyCoupon }) {
               >
                 <span className="coupon-text">
                   {isApplied && "✓ "}
-                  {coupon.code}
+                  {coupon.code} ({coupon.discountPercentage}% off)
                 </span>
 
                 <button

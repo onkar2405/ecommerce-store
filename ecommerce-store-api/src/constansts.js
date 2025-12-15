@@ -1,1 +1,1 @@
-export const NTH_ORDER_DISCOUNT = 2;
+export const NTH_ORDER_DISCOUNT = 5;

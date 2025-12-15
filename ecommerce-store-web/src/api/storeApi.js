@@ -31,10 +31,20 @@ export const getCartItems = () => {
 
 /**
  * Method to checkout the cart
+ * @param {string} appliedCoupon - Optional applied coupon code
  * @returns Promise resolving to the checkout result
  */
-export const checkout = () => {
-  return apiClient.post("/checkout");
+export const checkout = (appliedCoupon) => {
+  return apiClient
+    .post("/checkout", {
+      couponCode: appliedCoupon || "",
+    })
+    .catch((error) => {
+      // Extract error message from response
+      const errorMessage =
+        error.response?.data?.error || error.message || "Checkout failed";
+      throw new Error(errorMessage);
+    });
 };
 
 /**

@@ -8,36 +8,42 @@ import { checkout } from "../api/storeApi";
  *
  * Shows the order summary including subtotal, discount amount, applied coupon info,
  * and final total. Includes the checkout button to process the order. The discount
- * is displayed as 10% off when a coupon is applied and can be removed by the user.
+ * is displayed with the coupon's specific discount percentage.
  *
  * @component
  * @param {Object} props - Component props
  * @param {number} props.subTotal - Total price before discounts
  * @param {number} props.discount - Discount amount in rupees
+ * @param {number} [props.discountPercentage] - Discount percentage of applied coupon (default 0)
  * @param {string} [props.appliedCoupon] - Currently applied coupon code (null if none)
  * @param {Function} [props.onRemoveCoupon] - Callback when removing a coupon
+ * @param {Function} [props.onCartUpdate] - Callback to update cart count after checkout
  * @returns {React.ReactElement} Order summary section with checkout button
  *
  * @example
  * <TotalSummary
  *   subTotal={10000}
  *   discount={1000}
+ *   discountPercentage={10}
  *   appliedCoupon="SAVE10"
  *   onRemoveCoupon={() => removeCoupon()}
+ *   onCartUpdate={() => updateCart()}
  * />
  */
 const TotalSummary = ({
   subTotal,
   discount,
+  discountPercentage = 0,
   appliedCoupon,
   onRemoveCoupon,
+  onCartUpdate,
 }) => {
   const navigate = useNavigate();
 
   /**
    * Processes checkout and navigates to homepage after order placement.
-   * Shows success/error toast messages and adds a 1-second delay before navigation
-   * to allow toast visibility.
+   * Shows success/error toast messages. Only navigates on successful order placement.
+   * Invalid coupon errors are shown but don't navigate away, allowing user to try another coupon.
    *
    * @async
    * @function
@@ -45,18 +51,22 @@ const TotalSummary = ({
    */
   const onCheckout = async () => {
     try {
-      await checkout();
+      await checkout(appliedCoupon);
+      // Clear the applied coupon after successful checkout
+      onRemoveCoupon();
       toast.success("Order placed successfully!");
+      // Call the callback to update cart count
+      if (onCartUpdate) {
+        onCartUpdate();
+      }
       // small delay so toast is visible
       setTimeout(() => {
         navigate("/");
       }, 1000);
     } catch (e) {
-      toast.error("Failed to place the order!!", e.message);
-      // small delay so toast is visible
-      setTimeout(() => {
-        navigate("/");
-      }, 1000);
+      // Show error but don't navigate - let user try another coupon
+      const errorMessage = e?.message || "Failed to place the order!";
+      toast.error(errorMessage);
     }
   };
 
@@ -73,7 +83,7 @@ const TotalSummary = ({
         <span>Discount</span>
         <span className={discount > 0 ? "discount-green" : ""}>
           {discount > 0 ? `- ₹${discount}` : "₹0"}
-          {appliedCoupon && <span> (10% off)</span>}
+          {appliedCoupon && <span> ({discountPercentage}% off)</span>}
         </span>
       </div>
 
