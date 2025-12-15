@@ -114,13 +114,6 @@ export function CouponCode({ appliedCoupon, onApplyCoupon }) {
       const response = await getAvailableCoupons();
       const coupons = Array.isArray(response.data) ? response.data : [];
       setAvailableCoupons(coupons);
-
-      if (coupons.length === 0) {
-        setAvailableCoupons([]);
-        toast.info(
-          "No coupon codes available yet. Complete more orders to earn coupons!"
-        );
-      }
     } catch (e) {
       setAvailableCoupons([]);
       console.error("Error fetching coupons:", e);
