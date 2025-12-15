@@ -4,6 +4,9 @@ A full-stack e-commerce application built with React, Express.js, and Node.js.
 
 ## ✨ Features
 
+https://github.com/user-attachments/assets/0f8d1824-5e78-4339-ba54-89bcce2eb3a0
+
+
 ### Frontend
 
 - 📦 **Product Catalog** - See variety of products with images and prices
